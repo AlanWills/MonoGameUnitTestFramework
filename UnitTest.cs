@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -19,14 +20,25 @@ namespace UnitTestFramework
         /// <summary>
         /// An int to mark the number of tests that have failed
         /// </summary>
-        public int FailedTests { get; private set; }
+        public int TotalFailedTests { get; private set; }
+
+        /// <summary>
+        /// An int to mark the total number of discovered tests using reflection for the unit test class
+        /// </summary>
+        public int TotalRunTests { get; private set; }
+
+        /// <summary>
+        /// The test attribute used to store information on the class we will be testing in this Unit Test
+        /// </summary>
+        private TestClass TestClassAttr { get { return GetType().GetCustomAttribute<TestClass>(); } }
 
         #endregion
 
         public UnitTest()
         {
-            FailedTests = 0;
             FailedTestsInfo = new List<string>();
+
+            DebugUtils.AssertNotNull(TestClassAttr);
         }
 
         #region Utility Functions
@@ -39,70 +51,78 @@ namespace UnitTestFramework
             // Clear our output strings
             FailedTestsInfo.Clear();
 
-            MethodInfo[] methods = GetType().GetMethods();
+            // Run our OnTestClassStart function because we are beginning our test suite
+            OnTestClassStart();
 
-            List<MethodInfo> unitTests = new List<MethodInfo>();
-
-            // Loop through all the methods on the class and find all of the methods marked with our unit test attribute
-            foreach (MethodInfo method in methods)
+            // The unit test methods must be public to be discovered here
+            foreach (MethodInfo method in GetType().GetMethods())
             {
-                Test testAttr = method.GetCustomAttribute(typeof(Test)) as Test;
-                if (testAttr != null)
+                // Get the test attribute for this method
+                Test unitTest = method.GetCustomAttribute<Test>();
+                if (unitTest == null)
                 {
-                    // Check we do not accept any parameters
-                    Debug.Assert(method.GetParameters().Length == 0);
-
-                    // Add to our list of unit tests
-                    unitTests.Add(method);
+                    // This method does not have the test attribute, so move on
+                    continue;
                 }
-            }
 
-            // If our class has unit tests
-            if (unitTests.Count > 0)
-            {
-                // Run our OnTestClassStart function because we are beginning our test suite
-                OnTestClassStart();
+                // Find the valid inputs and invalid inputs attributes
+                // The former is required, the latter is optional
+                // The type is also inspected and invalid inputs are generated using standard values
+                // e.g. for float we would try -1, 0, 1, Infinity and Negative Infinity
+                // If however any of these are marked as valid inputs we would just ignore them
 
-                // Loop over each unit test, call the before test function, run the test and call the after test function
-                foreach (MethodInfo method in unitTests)
+                // Have extension functions for each type to generate a list of invalid inputs for our unit test
+
+                // Run the test for each valid input and if it fails we log an error
                 {
-                    OnTestStart();
+                    TestValidInputs validInputs = method.GetCustomAttribute<TestValidInputs>();
+                    DebugUtils.AssertNotNull(validInputs);
 
-                    method.Invoke(this, null);
-
-                    Test testAttr = method.GetCustomAttribute(typeof(Test)) as Test;
-                    if (!testAttr.Invoke(this))
+                    foreach (object validInput in validInputs)
                     {
-                        // Change this so it uses the attr's information like the function name and calling class
-                        RegisterFailure();
+                        // Loop over each unit test, call the before test function, run the test and call the after test function
+                        OnTestStart();
+
+                        if (!unitTest.Invoke(TestClassAttr, validInput))
+                        {
+                            // Logs the failure of the unit test
+                            FailedTestsInfo.Add(unitTest.RegisterFailure(TestClassAttr.TestingClass.Name));
+                            TotalFailedTests++;
+                        }
+
+                        TotalRunTests++;
+                        OnTestEnd();
+                    }
+                }
+
+                // Run the test for each invvalid input and if it succeeds we log an error
+                {
+                    TestInvalidInputs invalidInputs = method.GetCustomAttribute<TestInvalidInputs>();
+                    if (invalidInputs == null)
+                    {
+                        invalidInputs = new TestInvalidInputs();
                     }
 
-                    OnTestEnd();
+                    foreach (object invalidInput in invalidInputs)
+                    {
+                        // Loop over each unit test, call the before test function, run the test and call the after test function
+                        OnTestStart();
+
+                        if (unitTest.Invoke(TestClassAttr, invalidInput))
+                        {
+                            // Logs the success of the unit test - this is actually a failure as it should not succeed
+                            FailedTestsInfo.Add(unitTest.RegisterFailure(TestClassAttr.TestingClass.Name));
+                            TotalFailedTests++;
+                        }
+
+                        TotalRunTests++;
+                        OnTestEnd();
+                    }
                 }
-
-                // Run our OnTestClassEnd function because we have finished running all the tests on this class
-                OnTestClassEnd();
             }
-            else
-            {
-                Debug.Fail("No unit tests on registered unit test class: " + GetType().Name);
-            }
-        }
 
-        /// <summary>
-        /// Adds the name of the failed test and the file and line it failed in.
-        /// Increments our failed unit test number.
-        /// </summary>
-        private void RegisterFailure()
-        {
-            StackFrame callStack = new StackTrace(true).GetFrame(1);
-
-            string[] splitStrings = callStack.GetFileName().Split('\\');
-            Debug.Assert(splitStrings.Length > 0);
-
-            FailedTestsInfo.Add(callStack.GetMethod() + " failed " + splitStrings[splitStrings.Length - 1] + " at line number " + callStack.GetFileLineNumber().ToString());
-
-            FailedTests++;
+            // Run our OnTestClassEnd function because we have finished running all the tests on this class
+            OnTestClassEnd();
         }
 
         #endregion
