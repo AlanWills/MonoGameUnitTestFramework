@@ -42,9 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\Parameter Validation\ParametersAttribute.cs" />
+    <Compile Include="Attributes\Parameters\TemplateParametersAttribute.cs" />
+    <Compile Include="Attributes\Parameters\FunctionParametersAttribute.cs" />
     <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsNullAttribute .cs" />
     <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsTypeAttribute.cs" />
+    <Compile Include="Attributes\Test Outcome\ShouldFailAttribute.cs" />
+    <Compile Include="Attributes\Test Outcome\ShouldPassAttribute.cs" />
     <Compile Include="Attributes\TestClassForTypeAttribute.cs" />
     <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsNotNullAttribute.cs" />
     <Compile Include="Utils\DebugUtils.cs" />

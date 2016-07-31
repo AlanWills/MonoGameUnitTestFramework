@@ -2,8 +2,10 @@
 
 namespace UnitTestFramework
 {
-    public class Parameters : Attribute
+    public class FunctionParameters : Attribute
     {
+        public static string Name = "FunctionParameters";
+
         #region Properties and Fields
 
         public object[] Params { get; private set; }
@@ -23,13 +25,10 @@ namespace UnitTestFramework
             }
         }
 
-        public bool ShouldBeValid { get; private set; }
-
         #endregion
 
-        public Parameters(bool shouldBeValid, params object[] parameters)
+        public FunctionParameters(params object[] parameters)
         {
-            ShouldBeValid = shouldBeValid;
             Params = parameters;
         }
     }

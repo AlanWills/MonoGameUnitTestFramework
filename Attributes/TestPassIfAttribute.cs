@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace UnitTestFramework
@@ -25,16 +26,19 @@ namespace UnitTestFramework
 
         public bool Invoke(TestClassForType testClass, object[] inputs)
         {
+            List<object> inputsAsList = new List<object>(inputs);
+
             MethodInfo funcToTest = testClass.TestingClass.GetMethod(FunctionName);
             DebugUtils.AssertNotNull(funcToTest);
 
             if (funcToTest.IsGenericMethod)
             {
-                funcToTest = funcToTest.MakeGenericMethod(ParametersForCheckFunction[0] as Type);
+                // If the method we are testing is generic, we will have used the templated parameter set builder, so we can now extract that attribute from the method
+                //funcToTest = funcToTest.MakeGenericMethod(genericTypeArgument);
             }
 
             // Perform the function we are testing and obtain the output
-            object result = funcToTest.Invoke(null, inputs);
+            object result = funcToTest.Invoke(null, inputsAsList.ToArray());
             ParametersForCheckFunction.Add(result);
 
             // Run our check function on the output to see if the function has performed as we expected

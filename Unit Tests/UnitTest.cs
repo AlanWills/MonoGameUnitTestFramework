@@ -91,11 +91,13 @@ namespace UnitTestFramework
                 // Run the test for the parameter(s) and if it fails we log an error, using our custom unit testing implementation
                 else
                 {
-                    Parameters parameters = method.GetCustomAttribute<Parameters>();
+                    FunctionParameters parameters = method.GetCustomAttribute<FunctionParameters>();
                     DebugUtils.AssertNotNull(parameters);
 
+                    bool shouldPass = method.GetCustomAttribute<ShouldPass>() != null;
+
                     // If our test result is the opposite to whether the parameters are valid or not, then this test has returned the opposite result to what it should have done, so it has failed
-                    if (unitTest.Invoke(TestClassAttr, parameters.Params) != parameters.ShouldBeValid)
+                    if (unitTest.Invoke(TestClassAttr, parameters.Params) != shouldPass)
                     {
                         // Logs the failure of the unit test
                         FailedTestsInfo.Add(unitTest.RegisterFailure(TestClassAttr.TestingClass.Name) + " with parameters " + parameters.ParamsString);

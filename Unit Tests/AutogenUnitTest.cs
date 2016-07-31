@@ -18,33 +18,66 @@ namespace UnitTestFramework
         public class TestData
         {
             internal string MethodName { get; private set; }
-            internal List<object[]> ValidParameters { get; private set; }
-            internal List<object[]> InvalidParameters { get; private set; }
+            internal List<List<object>> ValidParameters { get; private set; }
+            internal List<List<object>> InvalidParameters { get; private set; }
             internal Type TestAttribute { get; private set; }
             internal string AttributeParamsString { get; private set; }
 
             internal TestData(string methodName, Type testAttributeType, params object[] attributeParams)
             {
                 MethodName = methodName;
-                ValidParameters = new List<object[]>();
-                InvalidParameters = new List<object[]>();
+                ValidParameters = new List<List<object>>();
+                InvalidParameters = new List<List<object>>();
                 TestAttribute = testAttributeType;
                 AttributeParamsString = attributeParams.CreateParameterString();
             }
 
+            #region Parameter Sets Builder Functions
+
+            // All these functions work in the same way
+            // They take a variadic number of parameters for the function we are invoking
+            // Then, either null or the type of the template function (if using generic version) is added to the end
+            // That way, we can push a type to use as the generic argument for any function we are testing which is generic
+            // If we do not need a generic type argument, we push null here and it will be ignored when writing the test
+            // If we do, it is written as an extra parameter to the attribute's constructor and will be dealt with there
+
             public TestData ValidParams(params object[] validParameters)
             {
-                ValidParameters.Add(validParameters);
+                List<object> parameters = new List<object>(validParameters);
+                parameters.Add(null);
+                ValidParameters.Add(parameters);
 
                 return this;
             }
 
-            public TestData InvalidParams(params object[] validParameters)
+            public TestData ValidParams<T>(params object[] validParameters)
             {
-                InvalidParameters.Add(validParameters);
+                List<object> parameters = new List<object>(validParameters);
+                parameters.Add(typeof(T));
+                ValidParameters.Add(parameters);
 
                 return this;
             }
+
+            public TestData InvalidParams(params object[] invalidParameters)
+            {
+                List<object> parameters = new List<object>(invalidParameters);
+                parameters.Add(null);
+                InvalidParameters.Add(parameters);
+
+                return this;
+            }
+
+            public TestData InvalidParams<T>(params object[] invalidParameters)
+            {
+                List<object> parameters = new List<object>(invalidParameters);
+                parameters.Add(typeof(T));
+                InvalidParameters.Add(parameters);
+
+                return this;
+            }
+
+            #endregion
         }
 
         #endregion
@@ -83,6 +116,8 @@ namespace UnitTestFramework
         /// </summary>
         private List<string> RequiredAssemblies { get; set; }
 
+        private static int testCounter = 1;
+
         #endregion
 
         public AutogenUnitTest()
@@ -117,12 +152,12 @@ namespace UnitTestFramework
         {
             foreach (TestData testData in AutogenTestData)
             {
-                foreach (object[] parameters in testData.ValidParameters)
+                foreach (List<object> parameters in testData.ValidParameters)
                 {
                     WriteTest(testData, parameters, true);
                 }
 
-                foreach (object[] parameters in testData.InvalidParameters)
+                foreach (List<object> parameters in testData.InvalidParameters)
                 {
                     WriteTest(testData, parameters, false);
                 }
@@ -134,24 +169,28 @@ namespace UnitTestFramework
         /// </summary>
         /// <param name="testData"></param>
         /// <param name="parameters"></param>
-        private void WriteTest(TestData testData, object[] parameters, bool shouldPass)
+        private void WriteTest(TestData testData, List<object> parameters, bool shouldPass)
         {
-            string parametersString = "[Parameters(" + shouldPass.ToString().ToLower();
-            if (parameters.Length > 0)
+            string templateParameters = "";
+            Type genericType = parameters[parameters.Count - 1] as Type;
+            parameters.RemoveAt(parameters.Count - 1);
+
+            if (genericType != null)
             {
-                parametersString += ", ";
+                templateParameters += "[" + TemplateParameters.Name + "(typeof(" + genericType.Name + "))]";
             }
 
+            string functionParameters = "[" + FunctionParameters.Name + "(";
             string parameterStringForFunctionName = "";
-            for (int i = 0; i < parameters.Length; i++)
+            for (int i = 0; i < parameters.Count; i++)
             {
                 parameterStringForFunctionName += parameters[i].ToString();
-                parametersString += parameters[i].CreateParameterString();
+                functionParameters += parameters[i].CreateParameterString();
 
-                if (i < parameters.Length - 1)
+                if (i < parameters.Count - 1)
                 {
                     parameterStringForFunctionName += "_";
-                    parametersString += ", ";
+                    functionParameters += ", ";
                 }
             }
 
@@ -173,9 +212,23 @@ namespace UnitTestFramework
             }
 
             WriteLine("[" + testData.TestAttribute.Name + "(\"" + testData.MethodName + "\"" + attributeParamsString + ")]");
-            WriteLine(parametersString + ")]");
-            WriteLine("public void Test_" + testData.MethodName + "_" + parameterStringForFunctionName + "() { }");
+
+            if (!string.IsNullOrEmpty(templateParameters))
+            {
+                WriteLine(templateParameters);
+            }
+
+            WriteLine(functionParameters + ")]");
+            // Yeah this is not working out
+            //WriteLine("public void Test_" + testData.MethodName + "_" + parameterStringForFunctionName + "() { }");
+
+            string passFailAttrString = shouldPass ? "ShouldPass" : "ShouldFail";
+
+            WriteLine("[" + passFailAttrString + "]");
+            WriteLine("public void Test_" + testCounter + "() { }");
             WriteLine("");
+
+            testCounter++;
         }
 
         /// <summary>
