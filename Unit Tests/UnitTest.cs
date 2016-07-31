@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -30,15 +31,13 @@ namespace UnitTestFramework
         /// <summary>
         /// The test attribute used to store information on the class we will be testing in this Unit Test
         /// </summary>
-        private TestClass TestClassAttr { get { return GetType().GetCustomAttribute<TestClass>(); } }
+        protected TestClassForType TestClassAttr { get { return GetType().GetCustomAttribute<TestClassForType>(); } }
 
         #endregion
 
         public UnitTest()
         {
             FailedTestsInfo = new List<string>();
-
-            DebugUtils.AssertNotNull(TestClassAttr);
         }
 
         #region Utility Functions
@@ -48,6 +47,8 @@ namespace UnitTestFramework
         /// </summary>
         public void Run()
         {
+            DebugUtils.AssertNotNull(TestClassAttr);
+
             // Clear our output strings
             FailedTestsInfo.Clear();
 
@@ -58,67 +59,56 @@ namespace UnitTestFramework
             foreach (MethodInfo method in GetType().GetMethods())
             {
                 // Get the test attribute for this method
-                Test unitTest = method.GetCustomAttribute<Test>();
-                if (unitTest == null)
+                TestPassIf unitTest = method.GetCustomAttribute<TestPassIf>();
+                TestMethodAttribute microsoftTest = method.GetCustomAttribute<TestMethodAttribute>();
+
+                if (unitTest == null && microsoftTest == null)
                 {
-                    // This method does not have the test attribute, so move on
+                    // This method is not a unit test
                     continue;
                 }
 
-                // Find the valid inputs and invalid inputs attributes
-                // The former is required, the latter is optional
-                // The type is also inspected and invalid inputs are generated using standard values
-                // e.g. for float we would try -1, 0, 1, Infinity and Negative Infinity
-                // If however any of these are marked as valid inputs we would just ignore them
+                // Call the before test function, run the test and call the after test function
+                OnTestStart();
 
-                // Have extension functions for each type to generate a list of invalid inputs for our unit test
+                // Turn off asserts when we are about to start our tests
+                Trace.Listeners.Clear();
 
-                // Run the test for each valid input and if it fails we log an error
+                if (unitTest == null)
                 {
-                    TestValidInputs validInputs = method.GetCustomAttribute<TestValidInputs>();
-                    DebugUtils.AssertNotNull(validInputs);
-
-                    foreach (object validInput in validInputs)
+                    // This is a method using the standard microsoft unit testing framework
+                    try
                     {
-                        // Loop over each unit test, call the before test function, run the test and call the after test function
-                        OnTestStart();
+                        method.Invoke(this, null);
+                    }
+                    catch
+                    {
+                        // Logs the failure of the unit test
+                        FailedTestsInfo.Add("The function " + method.Name + " in class " + GetType().Name + " failed");
+                        TotalFailedTests++;
+                    }
+                }
+                // Run the test for the parameter(s) and if it fails we log an error, using our custom unit testing implementation
+                else
+                {
+                    Parameters parameters = method.GetCustomAttribute<Parameters>();
+                    DebugUtils.AssertNotNull(parameters);
 
-                        if (!unitTest.Invoke(TestClassAttr, validInput))
-                        {
-                            // Logs the failure of the unit test
-                            FailedTestsInfo.Add(unitTest.RegisterFailure(TestClassAttr.TestingClass.Name));
-                            TotalFailedTests++;
-                        }
-
-                        TotalRunTests++;
-                        OnTestEnd();
+                    // If our test result is the opposite to whether the parameters are valid or not, then this test has returned the opposite result to what it should have done, so it has failed
+                    if (unitTest.Invoke(TestClassAttr, parameters.Params) != parameters.ShouldBeValid)
+                    {
+                        // Logs the failure of the unit test
+                        FailedTestsInfo.Add(unitTest.RegisterFailure(TestClassAttr.TestingClass.Name) + " with parameters " + parameters.ParamsString);
+                        TotalFailedTests++;
                     }
                 }
 
-                // Run the test for each invvalid input and if it succeeds we log an error
-                {
-                    TestInvalidInputs invalidInputs = method.GetCustomAttribute<TestInvalidInputs>();
-                    if (invalidInputs == null)
-                    {
-                        invalidInputs = new TestInvalidInputs();
-                    }
+                // Immediately turn asserts back on as soon as the test has finished
+                // We want to still catch problems in the OnTestBegin & OnTestEnd functions
+                Trace.Refresh();
 
-                    foreach (object invalidInput in invalidInputs)
-                    {
-                        // Loop over each unit test, call the before test function, run the test and call the after test function
-                        OnTestStart();
-
-                        if (unitTest.Invoke(TestClassAttr, invalidInput))
-                        {
-                            // Logs the success of the unit test - this is actually a failure as it should not succeed
-                            FailedTestsInfo.Add(unitTest.RegisterFailure(TestClassAttr.TestingClass.Name));
-                            TotalFailedTests++;
-                        }
-
-                        TotalRunTests++;
-                        OnTestEnd();
-                    }
-                }
+                TotalRunTests++;
+                OnTestEnd();
             }
 
             // Run our OnTestClassEnd function because we have finished running all the tests on this class
@@ -163,6 +153,11 @@ namespace UnitTestFramework
         public static bool CheckIsNull(object objectToTest)
         {
             return objectToTest == null;
+        }
+
+        public static bool CheckIsType(Type expectedType, object objectToTest)
+        {
+            return CheckIsNotNull(objectToTest) && objectToTest.GetType() == expectedType;
         }
 
         public static bool CheckReferencesAreEqual(object expected, object actual)

@@ -2,7 +2,7 @@
 
 namespace UnitTestFramework
 {
-    public class TestClass : Attribute
+    public class TestClassForType : Attribute
     {
         #region Properties and Fields
 
@@ -10,7 +10,7 @@ namespace UnitTestFramework
 
         #endregion
 
-        public TestClass(Type testingClass)
+        public TestClassForType(Type testingClass)
         {
             TestingClass = testingClass;
         }

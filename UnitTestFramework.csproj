@@ -42,17 +42,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\Input and Output Validation\TestInvalidInputsAttribute.cs" />
-    <Compile Include="Attributes\TestClassAttribute.cs" />
-    <Compile Include="Attributes\Test Function Attributes\TestNotNullAttribute.cs" />
-    <Compile Include="Attributes\Input and Output Validation\TestValidInputsAttribute.cs" />
-    <Compile Include="DebugUtils.cs" />
+    <Compile Include="Attributes\Parameter Validation\ParametersAttribute.cs" />
+    <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsNullAttribute .cs" />
+    <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsTypeAttribute.cs" />
+    <Compile Include="Attributes\TestClassForTypeAttribute.cs" />
+    <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsNotNullAttribute.cs" />
+    <Compile Include="Unit Tests\TestData.cs" />
+    <Compile Include="Utils\DebugUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Attributes\TestAttribute.cs" />
-    <Compile Include="TestHelperFunctions.cs" />
-    <Compile Include="UnitTest.cs" />
-    <Compile Include="UnitTestLibrary.cs" />
+    <Compile Include="Attributes\TestPassIfAttribute.cs" />
+    <Compile Include="Unit Tests\AutogenUnitTest.cs" />
+    <Compile Include="Unit Tests\UnitTest.cs" />
+    <Compile Include="Utils\ExtensionFunctions.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

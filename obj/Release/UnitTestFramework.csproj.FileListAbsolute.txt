@@ -1,0 +1,6 @@
+C:\Users\Alan\Documents\Visual Studio 2015\Projects\UnitTestFramework\UnitTestFramework\bin\Release\UnitTestFramework.dll
+C:\Users\Alan\Documents\Visual Studio 2015\Projects\UnitTestFramework\UnitTestFramework\bin\Release\UnitTestFramework.pdb
+C:\Users\Alan\Documents\Visual Studio 2015\Projects\UnitTestFramework\UnitTestFramework\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\Alan\Documents\Visual Studio 2015\Projects\UnitTestFramework\UnitTestFramework\obj\Release\UnitTestFramework.dll
+C:\Users\Alan\Documents\Visual Studio 2015\Projects\UnitTestFramework\UnitTestFramework\obj\Release\UnitTestFramework.pdb
+C:\Users\Alan\Documents\Visual Studio 2015\Projects\UnitTestFramework\UnitTestFramework\obj\Release\UnitTestFramework.csprojResolveAssemblyReference.cache
