@@ -47,7 +47,6 @@
     <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsTypeAttribute.cs" />
     <Compile Include="Attributes\TestClassForTypeAttribute.cs" />
     <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsNotNullAttribute.cs" />
-    <Compile Include="Unit Tests\TestData.cs" />
     <Compile Include="Utils\DebugUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Attributes\TestPassIfAttribute.cs" />

@@ -2,7 +2,7 @@
 
 namespace UnitTestFramework
 {
-    public static class ExtensionFunctions
+    internal static class ExtensionFunctions
     {
         public static string CreateParameterString(this object inputParameter)
         {
@@ -15,6 +15,10 @@ namespace UnitTestFramework
             else if (inputParameter is Type)
             {
                 objToString = "typeof(" + (inputParameter as Type).Name + ")";
+            }
+            else if (inputParameter is bool)
+            {
+                objToString = objToString.ToLower();
             }
 
             return objToString;

@@ -11,6 +11,44 @@ namespace UnitTestFramework
     /// </summary>
     public abstract class AutogenUnitTest : UnitTest
     {
+        // We only want this class to see the internals of the TestData class.
+        // The only public interface should be the BuildTest and Valid/InvalidParams.
+        #region Test Data
+
+        public class TestData
+        {
+            internal string MethodName { get; private set; }
+            internal List<object[]> ValidParameters { get; private set; }
+            internal List<object[]> InvalidParameters { get; private set; }
+            internal Type TestAttribute { get; private set; }
+            internal string AttributeParamsString { get; private set; }
+
+            internal TestData(string methodName, Type testAttributeType, params object[] attributeParams)
+            {
+                MethodName = methodName;
+                ValidParameters = new List<object[]>();
+                InvalidParameters = new List<object[]>();
+                TestAttribute = testAttributeType;
+                AttributeParamsString = attributeParams.CreateParameterString();
+            }
+
+            public TestData ValidParams(params object[] validParameters)
+            {
+                ValidParameters.Add(validParameters);
+
+                return this;
+            }
+
+            public TestData InvalidParams(params object[] validParameters)
+            {
+                InvalidParameters.Add(validParameters);
+
+                return this;
+            }
+        }
+
+        #endregion
+
         #region Properties and Fields
 
         /// <summary>
@@ -112,18 +150,20 @@ namespace UnitTestFramework
 
                 if (i < parameters.Length - 1)
                 {
+                    parameterStringForFunctionName += "_";
                     parametersString += ", ";
                 }
             }
 
-            parameterStringForFunctionName = parameterStringForFunctionName.Replace("\\", "");
+            parameterStringForFunctionName = parameterStringForFunctionName.Replace("\\", "_");
             parameterStringForFunctionName = parameterStringForFunctionName.Replace(" ", "");
             parameterStringForFunctionName = parameterStringForFunctionName.Replace("'", "");
+            parameterStringForFunctionName = parameterStringForFunctionName.Replace(".xml", "");
 
-            parameterStringForFunctionName += (string)testData.TestAttribute.GetField("Description").GetValue(null);
+            parameterStringForFunctionName += "_" + (string)testData.TestAttribute.GetField("Description").GetValue(null);
             if (!shouldPass)
             {
-                parameterStringForFunctionName += "Fail";
+                parameterStringForFunctionName += "_Fail";
             }
 
             string attributeParamsString = testData.AttributeParamsString;
@@ -134,12 +174,13 @@ namespace UnitTestFramework
 
             WriteLine("[" + testData.TestAttribute.Name + "(\"" + testData.MethodName + "\"" + attributeParamsString + ")]");
             WriteLine(parametersString + ")]");
-            WriteLine("public void Test" + testData.MethodName + parameterStringForFunctionName + "() { }");
+            WriteLine("public void Test_" + testData.MethodName + "_" + parameterStringForFunctionName + "() { }");
             WriteLine("");
         }
 
         /// <summary>
-        /// Builder pattern for specifying TestData
+        /// Builder pattern for specifying TestData.
+        /// The only public interface onto autogen test data to make the process as clear and simple as possible
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="testName"></param>
