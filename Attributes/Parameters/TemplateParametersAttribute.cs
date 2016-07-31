@@ -4,8 +4,6 @@ namespace UnitTestFramework
 {
     public class TemplateParameters : Attribute
     {
-        public static string Name = "TemplateParameters";
-
         #region Properties and Fields
 
         public Type[] Params { get; private set; }
@@ -24,6 +22,8 @@ namespace UnitTestFramework
                 return total;
             }
         }
+
+        public static string Name = "TemplateParameters";
 
         #endregion
 

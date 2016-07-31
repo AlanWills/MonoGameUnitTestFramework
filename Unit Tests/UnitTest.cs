@@ -31,7 +31,7 @@ namespace UnitTestFramework
         /// <summary>
         /// The test attribute used to store information on the class we will be testing in this Unit Test
         /// </summary>
-        protected TestClassForType TestClassAttr { get { return GetType().GetCustomAttribute<TestClassForType>(); } }
+        protected TestType TestClassAttr { get { return GetType().GetCustomAttribute<TestType>(); } }
 
         #endregion
 
@@ -59,10 +59,8 @@ namespace UnitTestFramework
             foreach (MethodInfo method in GetType().GetMethods())
             {
                 // Get the test attribute for this method
-                TestPassIf unitTest = method.GetCustomAttribute<TestPassIf>();
                 TestMethodAttribute microsoftTest = method.GetCustomAttribute<TestMethodAttribute>();
-
-                if (unitTest == null && microsoftTest == null)
+                if (microsoftTest == null && method.GetCustomAttribute<FunctionName>() == null)
                 {
                     // This method is not a unit test
                     continue;
@@ -74,7 +72,7 @@ namespace UnitTestFramework
                 // Turn off asserts when we are about to start our tests
                 Trace.Listeners.Clear();
 
-                if (unitTest == null)
+                if (microsoftTest != null)
                 {
                     // This is a method using the standard microsoft unit testing framework
                     try
@@ -88,19 +86,39 @@ namespace UnitTestFramework
                         TotalFailedTests++;
                     }
                 }
-                // Run the test for the parameter(s) and if it fails we log an error, using our custom unit testing implementation
+                // Run the test using our attributes and if it fails we log an error
                 else
                 {
-                    FunctionParameters parameters = method.GetCustomAttribute<FunctionParameters>();
-                    DebugUtils.AssertNotNull(parameters);
-
+                    FunctionName functionName = method.GetCustomAttribute<FunctionName>();
+                    TemplateParameters templateParameters = method.GetCustomAttribute<TemplateParameters>();
+                    FunctionParameters functionParameters = method.GetCustomAttribute<FunctionParameters>();
+                    TestPassIf testCheckFunc = method.GetCustomAttribute<TestPassIf>();
                     bool shouldPass = method.GetCustomAttribute<ShouldPass>() != null;
 
+                    DebugUtils.AssertNotNull(functionName);
+                    DebugUtils.AssertNotNull(functionParameters);
+
+                    MethodInfo funcToTest = TestClassAttr.TestingType.GetMethod(functionName.FuncName);
+                    DebugUtils.AssertNotNull(funcToTest);
+
+                    if (funcToTest.IsGenericMethod)
+                    {
+                        // If the method we are testing is generic, we will have used the templated parameter set builder, so we can now extract that attribute from the method
+                        funcToTest = funcToTest.MakeGenericMethod(templateParameters.Params);
+                    }
+
+                    // Perform the function we are testing and obtain the output
+                    object result = funcToTest.Invoke(null, functionParameters.Params);
+                    testCheckFunc.ParametersForCheckFunction.Add(result);
+
+                    // Run our check function on the output to see if the function has performed as we expected
+                    bool resultOfTest = (bool)testCheckFunc.CheckFunc.DynamicInvoke(testCheckFunc.ParametersForCheckFunction.ToArray());
+
                     // If our test result is the opposite to whether the parameters are valid or not, then this test has returned the opposite result to what it should have done, so it has failed
-                    if (unitTest.Invoke(TestClassAttr, parameters.Params) != shouldPass)
+                    if (resultOfTest != shouldPass)
                     {
                         // Logs the failure of the unit test
-                        FailedTestsInfo.Add(unitTest.RegisterFailure(TestClassAttr.TestingClass.Name) + " with parameters " + parameters.ParamsString);
+                        FailedTestsInfo.Add(testCheckFunc.RegisterFailure(TestClassAttr.TestingType.Name) + " with parameters " + functionParameters.ParamsString);
                         TotalFailedTests++;
                     }
                 }

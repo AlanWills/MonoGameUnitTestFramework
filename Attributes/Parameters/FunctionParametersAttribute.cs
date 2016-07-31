@@ -4,8 +4,6 @@ namespace UnitTestFramework
 {
     public class FunctionParameters : Attribute
     {
-        public static string Name = "FunctionParameters";
-
         #region Properties and Fields
 
         public object[] Params { get; private set; }
@@ -24,6 +22,8 @@ namespace UnitTestFramework
                 return total;
             }
         }
+
+        public static string Name = "FunctionParameters";
 
         #endregion
 

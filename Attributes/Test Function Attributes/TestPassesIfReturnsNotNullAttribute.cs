@@ -9,8 +9,8 @@ namespace UnitTestFramework
     {
         public static string Description = "IsNotNull";
 
-        public ReturnsNotNull(string functionName) :
-            base(functionName, (Func<object, bool>)UnitTest.CheckIsNotNull)
+        public ReturnsNotNull() :
+            base((Func<object, bool>)UnitTest.CheckIsNotNull)
         {
             
         }

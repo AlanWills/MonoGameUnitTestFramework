@@ -17,15 +17,15 @@ namespace UnitTestFramework
 
         public class TestData
         {
-            internal string MethodName { get; private set; }
+            internal string FunctionName { get; private set; }
             internal List<List<object>> ValidParameters { get; private set; }
             internal List<List<object>> InvalidParameters { get; private set; }
             internal Type TestAttribute { get; private set; }
             internal string AttributeParamsString { get; private set; }
 
-            internal TestData(string methodName, Type testAttributeType, params object[] attributeParams)
+            internal TestData(string functionName, Type testAttributeType, params object[] attributeParams)
             {
-                MethodName = methodName;
+                FunctionName = functionName;
                 ValidParameters = new List<List<object>>();
                 InvalidParameters = new List<List<object>>();
                 TestAttribute = testAttributeType;
@@ -205,13 +205,8 @@ namespace UnitTestFramework
                 parameterStringForFunctionName += "_Fail";
             }
 
-            string attributeParamsString = testData.AttributeParamsString;
-            if (!string.IsNullOrEmpty(attributeParamsString))
-            {
-                attributeParamsString = ", " + attributeParamsString;
-            }
-
-            WriteLine("[" + testData.TestAttribute.Name + "(\"" + testData.MethodName + "\"" + attributeParamsString + ")]");
+            WriteLine("[" + FunctionName.Name + "(\"" + testData.FunctionName + "\")]");
+            WriteLine("[" + testData.TestAttribute.Name + "(" + testData.AttributeParamsString + ")]");
 
             if (!string.IsNullOrEmpty(templateParameters))
             {
@@ -222,7 +217,7 @@ namespace UnitTestFramework
             // Yeah this is not working out
             //WriteLine("public void Test_" + testData.MethodName + "_" + parameterStringForFunctionName + "() { }");
 
-            string passFailAttrString = shouldPass ? "ShouldPass" : "ShouldFail";
+            string passFailAttrString = shouldPass ? ShouldPass.Name : ShouldFail.Name;
 
             WriteLine("[" + passFailAttrString + "]");
             WriteLine("public void Test_" + testCounter + "() { }");
@@ -241,12 +236,12 @@ namespace UnitTestFramework
         protected TestData BuildTest<T>(string testName, params object[] attributeParameters) where T : TestPassIf
         {
             // Need to check that enough attribute parameters have been passed for the attribute T
-            Type[] constructorTypes = new Type[attributeParameters.Length + 1];
-            constructorTypes[0] = typeof(string);   // Method name argument
+            // So need to create an array for all the types of the inputted parameters for the attribute
+            Type[] constructorTypes = new Type[attributeParameters.Length];
 
             for (int i = 0; i < attributeParameters.Length; i++)
             {
-                constructorTypes[i + 1] = attributeParameters[i].GetType();
+                constructorTypes[i] = attributeParameters[i].GetType();
 
                 // Add required assemblies or types
                 Type attrAsType = attributeParameters[i] as Type;
@@ -299,11 +294,11 @@ namespace UnitTestFramework
                 CurrentIndent += "\t";
 
                 WriteLine("/// <summary>");
-                WriteLine("/// Auto-generated unit tests for class " + TestClassAttr.TestingClass.Name);
+                WriteLine("/// Auto-generated unit tests for class " + TestClassAttr.TestingType.Name);
                 WriteLine("/// Do not edit by hand as changes will not be preserved between regenerations");
                 WriteLine("/// <summary>");
-                WriteLine("[TestClassForType(typeof(" + TestClassAttr.TestingClass.Name + "))]");
-                WriteLine("public class Test" + TestClassAttr.TestingClass.Name + "Autogen : UnitTest");
+                WriteLine("[" + TestType.Name + "(typeof(" + TestClassAttr.TestingType.Name + "))]");
+                WriteLine("public class Test" + TestClassAttr.TestingType.Name + "Autogen : UnitTest");
                 WriteLine("{");
 
                 CurrentIndent += "\t";
