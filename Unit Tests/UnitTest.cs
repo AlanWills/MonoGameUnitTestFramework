@@ -14,9 +14,9 @@ namespace UnitTestFramework
         #region Properties and Fields
 
         /// <summary>
-        /// A list of all the failed tests with info
+        /// A list of all the test results info
         /// </summary>
-        public List<string> FailedTestsInfo { get; private set; }
+        public List<string> TestResultsInfo { get; private set; }
 
         /// <summary>
         /// An int to mark the number of tests that have failed
@@ -37,7 +37,7 @@ namespace UnitTestFramework
 
         public UnitTest()
         {
-            FailedTestsInfo = new List<string>();
+            TestResultsInfo = new List<string>();
         }
 
         #region Utility Functions
@@ -50,7 +50,7 @@ namespace UnitTestFramework
             DebugUtils.AssertNotNull(TestClassAttr);
 
             // Clear our output strings
-            FailedTestsInfo.Clear();
+            TestResultsInfo.Clear();
 
             // Run our OnTestClassStart function because we are beginning our test suite
             OnTestClassStart();
@@ -82,7 +82,7 @@ namespace UnitTestFramework
                     catch
                     {
                         // Logs the failure of the unit test
-                        FailedTestsInfo.Add("The function " + method.Name + " in class " + GetType().Name + " failed");
+                        TestResultsInfo.Add("The function " + method.Name + " in class " + GetType().Name + " failed");
                         TotalFailedTests++;
                     }
                 }
@@ -115,12 +115,15 @@ namespace UnitTestFramework
                     bool resultOfTest = (bool)testCheckFunc.CheckFunc.DynamicInvoke(testCheckFunc.ParametersForCheckFunction.ToArray());
 
                     // If our test result is the opposite to whether the parameters are valid or not, then this test has returned the opposite result to what it should have done, so it has failed
+                    string resultString = method.Name + " passed";
                     if (resultOfTest != shouldPass)
                     {
                         // Logs the failure of the unit test
-                        FailedTestsInfo.Add(testCheckFunc.RegisterFailure(TestClassAttr.TestingType.Name) + " with parameters " + functionParameters.ParamsString);
+                        resultString = testCheckFunc.RegisterFailure(TestClassAttr.TestingType.Name) + " with parameters " + functionParameters.ParamsString;
                         TotalFailedTests++;
                     }
+
+                    TestResultsInfo.Add(resultString);
                 }
 
                 // Immediately turn asserts back on as soon as the test has finished
