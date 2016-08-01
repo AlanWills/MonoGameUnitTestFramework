@@ -10,7 +10,11 @@ namespace UnitTestFramework
 
             if (inputParameter is string)
             {
-                objToString = "@\"" + objToString + "\"";
+                objToString = "\"" + objToString + "\"";
+                if (objToString.Contains("\\"))
+                {
+                    objToString = "@" + objToString;
+                }
             }
             else if (inputParameter is Type)
             {

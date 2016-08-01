@@ -184,8 +184,10 @@ namespace UnitTestFramework
             string parameterStringForFunctionName = "";
             for (int i = 0; i < parameters.Count; i++)
             {
-                parameterStringForFunctionName += parameters[i].ToString();
-                functionParameters += parameters[i].CreateParameterString();
+                object ithParam = parameters[i];
+
+                parameterStringForFunctionName += ithParam.ToString();
+                functionParameters += ithParam != null ? ithParam.CreateParameterString() : "null";
 
                 if (i < parameters.Count - 1)
                 {
