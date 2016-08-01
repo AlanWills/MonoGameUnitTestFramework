@@ -18,16 +18,16 @@ namespace UnitTestFramework
         public class TestData
         {
             internal string FunctionName { get; private set; }
-            internal List<List<object>> ValidParameters { get; private set; }
-            internal List<List<object>> InvalidParameters { get; private set; }
+            internal List<Parameters> ValidParameters { get; private set; }
+            internal List<Parameters> InvalidParameters { get; private set; }
             internal Type TestAttribute { get; private set; }
             internal string AttributeParamsString { get; private set; }
 
             internal TestData(string functionName, Type testAttributeType, params object[] attributeParams)
             {
                 FunctionName = functionName;
-                ValidParameters = new List<List<object>>();
-                InvalidParameters = new List<List<object>>();
+                ValidParameters = new List<Parameters>();
+                InvalidParameters = new List<Parameters>();
                 TestAttribute = testAttributeType;
                 AttributeParamsString = attributeParams.CreateParameterString();
             }
@@ -41,40 +41,99 @@ namespace UnitTestFramework
             // If we do not need a generic type argument, we push null here and it will be ignored when writing the test
             // If we do, it is written as an extra parameter to the attribute's constructor and will be dealt with there
 
-            public TestData ValidParams(params object[] validParameters)
+            public Parameters ValidParams(params object[] parameters)
             {
-                List<object> parameters = new List<object>(validParameters);
-                parameters.Add(null);
-                ValidParameters.Add(parameters);
+                Parameters parametersWrapper = new Parameters(this, parameters);
+                parametersWrapper.ParametersForFunctions.Add(null);
+                ValidParameters.Add(parametersWrapper);
 
-                return this;
+                return parametersWrapper;
             }
 
-            public TestData ValidParams<T>(params object[] validParameters)
+            public Parameters ValidParams<T>(params object[] parameters)
             {
-                List<object> parameters = new List<object>(validParameters);
-                parameters.Add(typeof(T));
-                ValidParameters.Add(parameters);
+                Parameters parametersWrapper = new Parameters(this, parameters);
+                parametersWrapper.ParametersForFunctions.Add(typeof(T));
+                ValidParameters.Add(parametersWrapper);
 
-                return this;
+                return parametersWrapper;
             }
 
-            public TestData InvalidParams(params object[] invalidParameters)
+            public Parameters InvalidParams(params object[] parameters)
             {
-                List<object> parameters = new List<object>(invalidParameters);
-                parameters.Add(null);
-                InvalidParameters.Add(parameters);
+                Parameters parametersWrapper = new Parameters(this, parameters);
+                parametersWrapper.ParametersForFunctions.Add(null);
+                InvalidParameters.Add(parametersWrapper);
 
-                return this;
+                return parametersWrapper;
             }
 
-            public TestData InvalidParams<T>(params object[] invalidParameters)
+            public Parameters InvalidParams<T>(params object[] parameters)
             {
-                List<object> parameters = new List<object>(invalidParameters);
-                parameters.Add(typeof(T));
-                InvalidParameters.Add(parameters);
+                Parameters parametersWrapper = new Parameters(this, parameters);
+                parametersWrapper.ParametersForFunctions.Add(typeof(T));
+                InvalidParameters.Add(parametersWrapper);
 
-                return this;
+                return parametersWrapper;
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        // We only want this class to see the internals of the Parameters class.
+        // The only public interface should be the Valid/InvalidParams and Returns.
+        #region Parameters
+
+        public class Parameters
+        {
+            private TestData Data { get; set; }
+            internal List<object> ParametersForFunctions { get; private set; }
+            internal object ReturnValue { get; private set; }
+
+            internal Parameters(TestData data, params object[] parameters)
+            {
+                Data = data;
+                ParametersForFunctions = new List<object>(parameters);
+            }
+
+            #region Passthrough Parameter Builder Functions
+
+            // Wrappers for the functions in the TestData class
+
+            public Parameters ValidParams(params object[] parameters)
+            {
+                return Data.ValidParams(parameters);
+            }
+
+            public Parameters ValidParams<T>(params object[] parameters)
+            {
+                return Data.ValidParams<T>(parameters);
+            }
+
+            public Parameters InvalidParams(params object[] parameters)
+            {
+                return Data.InvalidParams(parameters);
+            }
+
+            public Parameters InvalidParams<T>(params object[] parameters)
+            {
+                return Data.InvalidParams<T>(parameters);
+            }
+
+            // Specify the object that should be returns by the function
+            // This is a way of overriding an object passed to an attribute and will only be used if the attribute requires an object to check (e.g. ReturnsType)
+
+            public TestData Returns()
+            {
+                return Returns(null);
+            }
+
+            public TestData Returns(object returnValue)
+            {
+                ReturnValue = returnValue;
+                return Data;
             }
 
             #endregion
@@ -152,14 +211,14 @@ namespace UnitTestFramework
         {
             foreach (TestData testData in AutogenTestData)
             {
-                foreach (List<object> parameters in testData.ValidParameters)
+                foreach (Parameters parameters in testData.ValidParameters)
                 {
-                    WriteTest(testData, parameters, true);
+                    WriteTest(testData, parameters.ParametersForFunctions, true);
                 }
 
-                foreach (List<object> parameters in testData.InvalidParameters)
+                foreach (Parameters parameters in testData.InvalidParameters)
                 {
-                    WriteTest(testData, parameters, false);
+                    WriteTest(testData, parameters.ParametersForFunctions, false);
                 }
             }
         }

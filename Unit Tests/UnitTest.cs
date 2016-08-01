@@ -14,11 +14,6 @@ namespace UnitTestFramework
         #region Properties and Fields
 
         /// <summary>
-        /// A list of all the test results info
-        /// </summary>
-        public List<string> TestResultsInfo { get; private set; }
-
-        /// <summary>
         /// An int to mark the number of tests that have failed
         /// </summary>
         public int TotalFailedTests { get; private set; }
@@ -33,11 +28,36 @@ namespace UnitTestFramework
         /// </summary>
         protected TestType TestClassAttr { get { return GetType().GetCustomAttribute<TestType>(); } }
 
+        private MethodInfo ClassInitialize { get; set; }
+        private MethodInfo ClassCleanup { get; set; }
+        private MethodInfo TestInitialize { get; set; }
+        private MethodInfo TestCleanup { get; set; }
+
         #endregion
 
         public UnitTest()
         {
-            TestResultsInfo = new List<string>();
+            // This is going to need cleaning up so we do checking to make sure there is only one of each attribute and one function does not have two attributes etc.
+            // Also do checks on no parameters and returning void
+            foreach (MethodInfo method in GetType().GetMethods())
+            {
+                if (method.GetCustomAttribute<ClassInitializeAttribute>() != null)
+                {
+                    ClassInitialize = method;
+                }
+                else if (method.GetCustomAttribute<ClassCleanupAttribute>() != null)
+                {
+                    ClassCleanup = method;
+                }
+                else if (method.GetCustomAttribute<TestInitializeAttribute>() != null)
+                {
+                    TestInitialize = method;
+                }
+                else if (method.GetCustomAttribute<TestCleanupAttribute>() != null)
+                {
+                    TestCleanup = method;
+                }
+            }
         }
 
         #region Utility Functions
@@ -45,12 +65,9 @@ namespace UnitTestFramework
         /// <summary>
         /// Runs all the unit tests within this class (they must be marked with our unit test attribute).
         /// </summary>
-        public void Run()
+        public List<string> Run()
         {
-            DebugUtils.AssertNotNull(TestClassAttr);
-
-            // Clear our output strings
-            TestResultsInfo.Clear();
+            List<string> output = new List<string>();
 
             // Run our OnTestClassStart function because we are beginning our test suite
             OnTestClassStart();
@@ -71,6 +88,7 @@ namespace UnitTestFramework
 
                 // Turn off asserts when we are about to start our tests
                 Trace.Listeners.Clear();
+                string resultString = method.Name + " passed";
 
                 if (microsoftTest != null)
                 {
@@ -82,7 +100,7 @@ namespace UnitTestFramework
                     catch
                     {
                         // Logs the failure of the unit test
-                        TestResultsInfo.Add("The function " + method.Name + " in class " + GetType().Name + " failed");
+                        resultString = "The function " + method.Name + " in class " + GetType().Name + " failed";
                         TotalFailedTests++;
                     }
                 }
@@ -115,16 +133,15 @@ namespace UnitTestFramework
                     bool resultOfTest = (bool)testCheckFunc.CheckFunc.DynamicInvoke(testCheckFunc.ParametersForCheckFunction.ToArray());
 
                     // If our test result is the opposite to whether the parameters are valid or not, then this test has returned the opposite result to what it should have done, so it has failed
-                    string resultString = method.Name + " passed";
                     if (resultOfTest != shouldPass)
                     {
                         // Logs the failure of the unit test
                         resultString = testCheckFunc.RegisterFailure(TestClassAttr.TestingType.Name) + " with parameters " + functionParameters.ParamsString;
                         TotalFailedTests++;
                     }
-
-                    TestResultsInfo.Add(resultString);
                 }
+
+                output.Add(resultString);
 
                 // Immediately turn asserts back on as soon as the test has finished
                 // We want to still catch problems in the OnTestBegin & OnTestEnd functions
@@ -136,6 +153,8 @@ namespace UnitTestFramework
 
             // Run our OnTestClassEnd function because we have finished running all the tests on this class
             OnTestClassEnd();
+
+            return output;
         }
 
         #endregion
@@ -145,24 +164,52 @@ namespace UnitTestFramework
         /// <summary>
         /// A function called when our test class begins running.
         /// Called before any test is run.
+        /// Invokes the function on this type which has been marked with the microsoft unit testing framework ClassInitialize attribute.
         /// </summary>
-        protected virtual void OnTestClassStart() { }
+        private void OnTestClassStart()
+        {
+            if (ClassInitialize != null)
+            {
+                ClassInitialize.Invoke(this, new object[] { null });
+            }
+        }
 
         /// <summary>
         /// A function called when our test class has finished running.
         /// Called after every test has run.
+        /// Invokes the function on this type which has been marked with the microsoft unit testing framework ClassCleanUp attribute.
         /// </summary>
-        protected virtual void OnTestClassEnd() { }
+        private void OnTestClassEnd()
+        {
+            if (ClassCleanup != null)
+            {
+                ClassCleanup.Invoke(this, null);
+            }
+        }
 
         /// <summary>
         /// A function called before every test is run.
+        /// Invokes the function on this type which has been marked with the microsoft unit testing framework TestInitialize attribute.
         /// </summary>
-        protected virtual void OnTestStart() { }
+        private void OnTestStart()
+        {
+            if (TestInitialize != null)
+            {
+                TestInitialize.Invoke(this, null);
+            }
+        }
 
         /// <summary>
         /// A function called after every test is run.
+        /// Invokes the function on this type which has been marked with the microsoft unit testing framework TestCleanUp attribute.
         /// </summary>
-        protected virtual void OnTestEnd() { }
+        private void OnTestEnd()
+        {
+            if (TestCleanup != null)
+            {
+                TestCleanup.Invoke(this, null);
+            }
+        }
 
         #endregion
 
