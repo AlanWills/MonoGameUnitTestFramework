@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace UnitTestFramework
 {
@@ -18,11 +20,28 @@ namespace UnitTestFramework
             }
             else if (inputParameter is Type)
             {
-                objToString = "typeof(" + (inputParameter as Type).Name + ")";
+                string typeName = (inputParameter as Type).Name;
+                if (typeName == "Single")
+                {
+                    typeName = "float";
+                }
+
+                objToString = "typeof(" + typeName + ")";
             }
             else if (inputParameter is bool)
             {
                 objToString = objToString.ToLower();
+            }
+            else if (inputParameter is IList &&
+                     inputParameter.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(List<>)))
+            {
+                // Yeah this needs to be optimized but for now it is the easiest thing
+                // Definitely want to avoid allocating another array for the list
+                IList list = inputParameter as IList;
+                object[] objects = new object[list.Count];
+                list.CopyTo(objects, 0);
+
+                objToString = "new List<object>() { " + objects.CreateParameterString() + " }";
             }
 
             return objToString;
@@ -33,7 +52,15 @@ namespace UnitTestFramework
             string paramString = "";
             for (int i = 0; i < inputParameters.Length; i++)
             {
-                paramString += inputParameters[i].CreateParameterString();
+                if (inputParameters[i] == null)
+                {
+                    paramString += "null";
+                }
+                else
+                {
+                    paramString += inputParameters[i].CreateParameterString();
+                }
+
                 if (i < inputParameters.Length - 1)
                 {
                     paramString += ", ";

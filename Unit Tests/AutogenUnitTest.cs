@@ -239,33 +239,8 @@ namespace UnitTestFramework
                 templateParameters += "[" + TemplateParameters.Name + "(typeof(" + genericType.Name + "))]";
             }
 
-            string functionParameters = "[" + FunctionParameters.Name + "(";
-            string parameterStringForFunctionName = "";
-            for (int i = 0; i < parameters.Count; i++)
-            {
-                object ithParam = parameters[i];
-
-                parameterStringForFunctionName += ithParam.ToString();
-                functionParameters += ithParam != null ? ithParam.CreateParameterString() : "null";
-
-                if (i < parameters.Count - 1)
-                {
-                    parameterStringForFunctionName += "_";
-                    functionParameters += ", ";
-                }
-            }
-
-            parameterStringForFunctionName = parameterStringForFunctionName.Replace("\\", "_");
-            parameterStringForFunctionName = parameterStringForFunctionName.Replace(" ", "");
-            parameterStringForFunctionName = parameterStringForFunctionName.Replace("'", "");
-            parameterStringForFunctionName = parameterStringForFunctionName.Replace(".xml", "");
-
-            parameterStringForFunctionName += "_" + (string)testData.TestAttribute.GetField("Description").GetValue(null);
-            if (!shouldPass)
-            {
-                parameterStringForFunctionName += "_Fail";
-            }
-
+            string functionParameters = "[" + FunctionParameters.Name + "(" + parameters.ToArray().CreateParameterString();
+            
             WriteLine("[" + FunctionName.Name + "(\"" + testData.FunctionName + "\")]");
             WriteLine("[" + testData.TestAttribute.Name + "(" + testData.AttributeParamsString + ")]");
 
@@ -275,8 +250,6 @@ namespace UnitTestFramework
             }
 
             WriteLine(functionParameters + ")]");
-            // Yeah this is not working out
-            //WriteLine("public void Test_" + testData.MethodName + "_" + parameterStringForFunctionName + "() { }");
 
             string passFailAttrString = shouldPass ? ShouldPass.Name : ShouldFail.Name;
 
