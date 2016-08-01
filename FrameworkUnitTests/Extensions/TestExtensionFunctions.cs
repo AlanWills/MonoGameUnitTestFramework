@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTestFramework;
 
@@ -82,6 +83,59 @@ namespace FrameworkUnitTests
         {
             object mockClassTypeAsObject = new MockClass().GetType();
             Assert.AreEqual("typeof(MockClass)", mockClassTypeAsObject.CreateParameterString());
+        }
+    }
+
+    // Improved builder pattern for specifying return values
+    public class TestData
+    {
+        public void Build()
+        {
+            Make().
+                ValidParameters(5, true).Returns("blah").
+                ValidParameters().
+                ValidParameters().Returns();
+        }
+
+        public TestData Make()
+        {
+            return this;
+        }
+
+        public Parameters ValidParameters(params object[] parameters)
+        {
+            // Create and store Parameters class instance here
+            return new Parameters(this);
+        }
+
+        public class Parameters
+        {
+            private TestData Data;
+
+            public Parameters(TestData data)
+            {
+                Data = data;
+            }
+
+
+            public Parameters ValidParameters(params object[] parameters)
+            {
+                // Create and store Parameters class instance here
+                return Data.ValidParameters(parameters);
+            }
+
+            public TestData Returns()
+            {
+                // Store return value here
+                return Data;
+            }
+
+            public TestData Returns(object returnObject)
+            {
+                // Store return value here
+                return Data;
+                See me
+            }
         }
     }
 }
