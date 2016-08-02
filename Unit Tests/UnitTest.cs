@@ -23,10 +23,24 @@ namespace UnitTestFramework
         /// </summary>
         public int TotalRunTests { get; private set; }
 
+        private TestType testClassAttr = null;
+        protected TestType TestClassAttr
+        {
+            get
+            {
+                if (testClassAttr == null)
+                {
+                    testClassAttr = GetType().GetCustomAttribute<TestType>();
+                }
+
+                return testClassAttr;
+            }
+        }
+
         /// <summary>
         /// The test attribute used to store information on the class we will be testing in this Unit Test
         /// </summary>
-        protected TestType TestClassAttr { get { return GetType().GetCustomAttribute<TestType>(); } }
+        protected Type TestClass { get { return TestClassAttr.TestingType; } }
 
         private MethodInfo ClassInitialize { get; set; }
         private MethodInfo ClassCleanup { get; set; }
@@ -75,6 +89,14 @@ namespace UnitTestFramework
             // The unit test methods must be public to be discovered here
             foreach (MethodInfo method in GetType().GetMethods())
             {
+                object classWeAreTestingInstance = null;
+                if (!method.IsStatic)
+                {
+                    // Create an instance for acting on when we invoke our function
+                    // Currently we do not support 
+                    classWeAreTestingInstance = Activator.CreateInstance(TestClassAttr.MockTestingType);
+                }
+
                 // Get the test attribute for this method
                 TestMethodAttribute microsoftTest = method.GetCustomAttribute<TestMethodAttribute>();
                 if (microsoftTest == null && method.GetCustomAttribute<FunctionName>() == null)
@@ -116,7 +138,7 @@ namespace UnitTestFramework
                     DebugUtils.AssertNotNull(functionName);
                     DebugUtils.AssertNotNull(functionParameters);
 
-                    MethodInfo funcToTest = TestClassAttr.TestingType.GetMethod(functionName.FuncName);
+                    MethodInfo funcToTest = TestClass.GetMethod(functionName.FuncName);
                     DebugUtils.AssertNotNull(funcToTest);
 
                     if (funcToTest.IsGenericMethod)
@@ -126,7 +148,8 @@ namespace UnitTestFramework
                     }
 
                     // Perform the function we are testing and obtain the output
-                    object result = funcToTest.Invoke(null, functionParameters.Params);
+                    // The 'classWeAreTestingInstance' will be null if the function is static
+                    object result = funcToTest.Invoke(classWeAreTestingInstance, functionParameters.Params);
                     testCheckFunc.ParametersForCheckFunction.Add(result);
 
                     // Run our check function on the output to see if the function has performed as we expected
@@ -136,7 +159,7 @@ namespace UnitTestFramework
                     if (resultOfTest != shouldPass)
                     {
                         // Logs the failure of the unit test
-                        resultString = testCheckFunc.RegisterFailure(TestClassAttr.TestingType.Name) + " with parameters " + functionParameters.ParamsString;
+                        resultString = testCheckFunc.RegisterFailure(TestClass.Name) + " with parameters " + functionParameters.ParamsString;
                         TotalFailedTests++;
                     }
                 }
@@ -233,6 +256,40 @@ namespace UnitTestFramework
         public static bool CheckReferencesAreEqual(object expected, object actual)
         {
             return expected == actual;
+        }
+
+        public static bool CheckInstanceFunctionCallSuccess(object objectToActOn, string functionName, params object[] functionParameters)
+        {
+            MethodInfo method = objectToActOn.GetType().GetMethod(functionName);
+            DebugUtils.AssertNotNull(method);
+
+            try
+            {
+                method.Invoke(objectToActOn, functionParameters);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool CheckStaticFunctionCallSuccess(Type typeWithFunctionToTest, string functionName, params object[] functionParameters)
+        {
+            MethodInfo method = typeWithFunctionToTest.GetMethod(functionName);
+            DebugUtils.AssertNotNull(method);
+
+            try
+            {
+                method.Invoke(null, functionParameters);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

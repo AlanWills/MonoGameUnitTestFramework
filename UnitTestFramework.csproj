@@ -45,6 +45,7 @@
     <Compile Include="Attributes\FunctionNameAttribute.cs" />
     <Compile Include="Attributes\Parameters\TemplateParametersAttribute.cs" />
     <Compile Include="Attributes\Parameters\FunctionParametersAttribute.cs" />
+    <Compile Include="Attributes\Test Function Attributes\TestPassesIfFunctionCallSuccessAttribute.cs" />
     <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsNullAttribute .cs" />
     <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsTypeAttribute.cs" />
     <Compile Include="Attributes\Test Outcome\ShouldFailAttribute.cs" />

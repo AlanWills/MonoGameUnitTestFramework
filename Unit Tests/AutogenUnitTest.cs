@@ -328,11 +328,11 @@ namespace UnitTestFramework
                 CurrentIndent += "\t";
 
                 WriteLine("/// <summary>");
-                WriteLine("/// Auto-generated unit tests for class " + TestClassAttr.TestingType.Name);
+                WriteLine("/// Auto-generated unit tests for class " + TestClass.Name);
                 WriteLine("/// Do not edit by hand as changes will not be preserved between regenerations");
                 WriteLine("/// <summary>");
-                WriteLine("[" + TestType.Name + "(typeof(" + TestClassAttr.TestingType.Name + "))]");
-                WriteLine("public class Test" + TestClassAttr.TestingType.Name + "Autogen : UnitTest");
+                WriteLine("[" + TestType.Name + "(testingType: typeof(" + TestClass.Name + "))]");
+                WriteLine("public class Test" + TestClass.Name + "Autogen : UnitTest");
                 WriteLine("{");
 
                 CurrentIndent += "\t";

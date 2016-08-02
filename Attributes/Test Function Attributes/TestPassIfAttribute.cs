@@ -7,7 +7,7 @@ namespace UnitTestFramework
     {
         #region Properties and Fields
 
-        public Delegate CheckFunc { get; set; }
+        public Delegate CheckFunc { get; private set; }
         public List<object> ParametersForCheckFunction { get; private set; }
 
         #endregion
