@@ -187,6 +187,9 @@ namespace UnitTestFramework
                 "_2DEngine",
                 "UnitTestFramework"
             };
+
+            CheckAssemblyRequiredForType(TestClass);
+            CheckAssemblyRequiredForType(TestClassAttr.MockTestingType);
         }
 
         #region Virtual Functions
@@ -281,25 +284,30 @@ namespace UnitTestFramework
                 Type attrAsType = attributeParameters[i] as Type;
                 if (attrAsType != null)
                 {
-                    string assembly = attrAsType.FullName.Replace(attrAsType.Name, "");
-                    assembly = assembly.Remove(assembly.Length - 1);   // Remove the "." at the end
-
-                    if (!RequiredAssemblies.Exists(x => x == assembly))
-                    {
-                        // Add if required - if already added no need to repeat
-                        RequiredAssemblies.Add(assembly);
-                    }
+                    CheckAssemblyRequiredForType(attrAsType);
                 }
             }
 
-            Debug.Assert(typeof(T).GetConstructor(constructorTypes) != null);
+            //Debug.Assert(typeof(T).GetConstructor(constructorTypes) != null);
             TestData testData = new TestData(testName, typeof(T), attributeParameters);
             AutogenTestData.Add(testData);
 
             return testData;
         }
 
-        public void WriteLine(string text)
+        private void CheckAssemblyRequiredForType(Type type)
+        {
+            string assembly = type.FullName.Replace(type.Name, "");
+            assembly = assembly.Remove(assembly.Length - 1);   // Remove the "." at the end
+
+            if (!RequiredAssemblies.Exists(x => x == assembly))
+            {
+                // Add if required - if already added no need to repeat
+                RequiredAssemblies.Add(assembly);
+            }
+        }
+
+        protected void WriteLine(string text)
         {
             Writer.WriteLine(CurrentIndent + text);
         }
@@ -331,7 +339,7 @@ namespace UnitTestFramework
                 WriteLine("/// Auto-generated unit tests for class " + TestClass.Name);
                 WriteLine("/// Do not edit by hand as changes will not be preserved between regenerations");
                 WriteLine("/// <summary>");
-                WriteLine("[" + TestType.Name + "(testingType: typeof(" + TestClass.Name + "))]");
+                WriteLine("[" + TestType.Name + "(testingType: typeof(" + TestClass.Name + "), mockTestingType: typeof(" + TestClassAttr.MockTestingType.Name + "))]");
                 WriteLine("public class Test" + TestClass.Name + "Autogen : UnitTest");
                 WriteLine("{");
 

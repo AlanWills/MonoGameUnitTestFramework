@@ -1,21 +1,21 @@
-﻿namespace UnitTestFramework
+﻿using System;
+
+namespace UnitTestFramework
 {
     // Only supports instance functions for now
     public class FunctionSuccess : TestPassIf
     {
-        #region Properties and Fields
-
-        /// <summary>
-        /// The name of the function we will be applying to the object
-        /// </summary>
-        private string FunctionName { get; set; }
-
-        #endregion
-
-        public FunctionSuccess(string functionName, params object[] parametersForFunction) :
-            base(null, parametersForFunction)
+        public FunctionSuccess(string functionName) :
+            base((Func<object, string, bool>)UnitTest.CheckInstanceFunctionCallSuccess)
         {
-            FunctionName = functionName;
+            RequiresClassInstance = true;
+            ParametersForCheckFunction.Insert(0, functionName);
         }
+
+        //public FunctionSuccess(string functionName, params object[] parametersForFunction) :
+        //    base((Func<object, string, object[], bool>)UnitTest.CheckInstanceFunctionCallSuccess, parametersForFunction)
+        //{
+        //    ParametersForCheckFunction.Insert(0, functionName);
+        //}
     }
 }

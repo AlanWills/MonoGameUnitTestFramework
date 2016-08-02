@@ -10,7 +10,7 @@ namespace UnitTestFramework
         public static string Description = "IsType";
 
         public ReturnsType(Type expectedType) :
-            base((Func<Type, object, bool>)UnitTest.CheckIsType, expectedType)
+            base((Func<object, Type, bool>)UnitTest.CheckIsType, expectedType)
         {
         }
     }
