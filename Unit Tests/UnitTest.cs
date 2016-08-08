@@ -286,6 +286,18 @@ namespace UnitTestFramework
 
             return true;
         }
+
+        /// <summary>
+        /// For strings and primitives it will not perform a reference check, but rather that their values are equal.
+        /// For lists it will also not perform a reference check, but rather unpack their contents and check them for value equality.
+        /// </summary>
+        /// <param name="expected"></param>
+        /// <param name="actual"></param>
+        /// <returns></returns>
+        public static bool CheckValue(object expected, object actual)
+        {
+            return true;
+        }
         
         #endregion
     }

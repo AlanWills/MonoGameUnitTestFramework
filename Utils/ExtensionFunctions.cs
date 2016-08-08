@@ -69,5 +69,15 @@ namespace UnitTestFramework
 
             return paramString;
         }
+
+        public static bool CheckListValuesEqual(this List<object> actual, List<object> expected)
+        {
+            if (actual.Count != expected.Count) { return false; }
+
+            foreach (object obj in actual)
+            {
+                if (!expected.Exists(x => x.))
+            }
+        }
     }
 }
