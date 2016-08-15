@@ -79,9 +79,9 @@ namespace UnitTestFramework
         /// <summary>
         /// Runs all the unit tests within this class (they must be marked with our unit test attribute).
         /// </summary>
-        public List<string> Run()
+        public List<Tuple<bool, string>> Run()
         {
-            List<string> output = new List<string>();
+            List<Tuple<bool, string>> output = new List<Tuple<bool, string>>();
 
             // Run our OnTestClassStart function because we are beginning our test suite
             OnTestClassStart();
@@ -97,12 +97,13 @@ namespace UnitTestFramework
                     continue;
                 }
 
+                bool testPassed = true;
+
                 // Call the before test function, run the test and call the after test function
                 OnTestStart();
 
                 // Turn off asserts when we are about to start our tests
                 Trace.Listeners.Clear();
-                string resultString = method.Name + " passed";
 
                 if (microsoftTest != null)
                 {
@@ -114,8 +115,8 @@ namespace UnitTestFramework
                     catch
                     {
                         // Logs the failure of the unit test
-                        resultString =  method.Name + " failed";
                         TotalFailedTests++;
+                        testPassed = false;
                     }
                 }
                 // Run the test using our attributes and if it fails we log an error
@@ -173,15 +174,15 @@ namespace UnitTestFramework
                     bool resultOfTest = (bool)testCheckFunc.CheckFunc.DynamicInvoke(testCheckFunc.ParametersForCheckFunction.ToArray());
 
                     // If our test result is the opposite to whether the parameters are valid or not, then this test has returned the opposite result to what it should have done, so it has failed
-                    if (resultOfTest != shouldPass)
+                    testPassed = resultOfTest != shouldPass;
+                    if (testPassed)
                     {
                         // Logs the failure of the unit test
-                        resultString = method.Name + " failed";
                         TotalFailedTests++;
                     }
                 }
 
-                output.Add(resultString);
+                output.Add(new Tuple<bool, string>(testPassed, method.Name));
 
                 // Immediately turn asserts back on as soon as the test has finished
                 // We want to still catch problems in the OnTestBegin & OnTestEnd functions
@@ -199,7 +200,7 @@ namespace UnitTestFramework
 
         #endregion
 
-        #region Virtual Functions
+        #region Test/Class Setup & TearDown Functions
 
         /// <summary>
         /// A function called when our test class begins running.
@@ -253,7 +254,7 @@ namespace UnitTestFramework
 
         #endregion
 
-        #region Test Functions
+        #region Unit Test Functions
 
         public static bool CheckIsNotNull(object objectToTest)
         {

@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="MonoGame.Framework, Version=3.5.1.1679, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -53,6 +54,7 @@
     <Compile Include="Attributes\Test Outcome\ShouldPassAttribute.cs" />
     <Compile Include="Attributes\TestTypeAttribute.cs" />
     <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsNotNullAttribute.cs" />
+    <Compile Include="Screens\UnitTestGameMainMenuScreen.cs" />
     <Compile Include="Utils\DebugUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Attributes\Test Function Attributes\TestPassIfAttribute.cs" />
@@ -60,7 +62,16 @@
     <Compile Include="Unit Tests\UnitTest.cs" />
     <Compile Include="Utils\ExtensionFunctions.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\2DEngine\2DEngineData\2DEngineData.csproj">
+      <Project>{ed8a2787-963c-45ce-9405-d4a031b3a977}</Project>
+      <Name>2DEngineData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\2DEngine\2DEngine\2DEngine.csproj">
+      <Project>{b56f5aa9-69a8-454a-9ee5-a815735804b7}</Project>
+      <Name>2DEngine</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

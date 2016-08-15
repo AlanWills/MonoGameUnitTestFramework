@@ -70,14 +70,22 @@ namespace UnitTestFramework
             return paramString;
         }
 
-        public static bool CheckListValuesEqual(this List<object> actual, List<object> expected)
+        public static bool CheckUnorderedListValuesEqual(this List<object> actual, List<object> expected)
         {
-            if (actual.Count != expected.Count) { return false; }
+            //if (actual.Count != expected.Count) { return false; }
 
-            foreach (object obj in actual)
-            {
-                if (!expected.Exists(x => x.))
-            }
+            //foreach (object obj in actual)
+            //{
+            //    object matchingObj = expected.Find(x => obj.ValueEquals(x));
+            //    if (matchingObj == null)
+            //    {
+            //        return false;
+            //    }
+
+            //    expected.Remove(matchingObj);
+            //}
+
+            return true;
         }
     }
 }
