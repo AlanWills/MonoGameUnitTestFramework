@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     /// <summary>
     /// This class does not do explicit testing, but is rather a schema for generating repetitive unit tests.
@@ -185,7 +185,7 @@ namespace UnitTestFramework
             RequiredAssemblies = new List<string>()
             {
                 "_2DEngine",
-                "UnitTestFramework"
+                "MonoGameUnitTestFramework"
             };
 
             CheckAssemblyRequiredForType(TestClass);

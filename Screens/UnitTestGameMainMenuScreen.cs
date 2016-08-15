@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     /// <summary>
     /// The only screen for unit testing game dependent classes.  Will run the tests, display the output and then close.

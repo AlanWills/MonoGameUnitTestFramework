@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     /// <summary>
     /// The attribute representing testing that a method returns an object of the inputted type which is also not null

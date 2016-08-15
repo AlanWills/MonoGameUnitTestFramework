@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     public class TemplateParameters : Attribute
     {

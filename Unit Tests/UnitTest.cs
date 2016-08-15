@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     /// <summary>
     /// The base class for every unit test.

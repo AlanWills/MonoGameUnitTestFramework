@@ -56,9 +56,9 @@
     <Compile Include="Extensions\TestCreateParameterStringSingleObject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UnitTestFramework.csproj">
+    <ProjectReference Include="..\MonoGameUnitTestFramework.csproj">
       <Project>{a9189426-6668-474f-b709-6050f2707c02}</Project>
-      <Name>UnitTestFramework</Name>
+      <Name>MonoGameUnitTestFramework</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

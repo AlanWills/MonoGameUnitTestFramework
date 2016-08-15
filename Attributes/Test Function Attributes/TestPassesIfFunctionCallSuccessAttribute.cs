@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     // Only supports instance functions for now
     public class FunctionSuccess : TestPassIf

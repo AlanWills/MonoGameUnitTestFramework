@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using UnitTestFramework;
+using MonoGameUnitTestFramework;
 
 namespace FrameworkUnitTests
 {

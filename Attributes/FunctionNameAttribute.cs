@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     /// <summary>
     /// Stores the name of the function we are testing

@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestFramework", "UnitTestFramework.csproj", "{A9189426-6668-474F-B709-6050F2707C02}"
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGameUnitTestFramework", "MonoGameUnitTestFramework.csproj", "{A9189426-6668-474F-B709-6050F2707C02}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrameworkUnitTests", "FrameworkUnitTests\FrameworkUnitTests.csproj", "{3224455B-987E-4A06-8C4C-CFEBA9BE743D}"
 EndProject

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     /// <summary>
     /// The test attribute which corresponds to a unit test for checking an object is null

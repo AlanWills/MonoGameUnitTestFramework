@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using UnitTestFramework;
+using MonoGameUnitTestFramework;
 using System.Collections.Generic;
 
 namespace FrameworkUnitTests

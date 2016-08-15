@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     public static class DebugUtils
     {

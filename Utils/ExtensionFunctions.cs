@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     internal static class ExtensionFunctions
     {

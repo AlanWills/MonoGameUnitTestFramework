@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UnitTestFramework
+namespace MonoGameUnitTestFramework
 {
     public abstract class TestPassIf : Attribute
     {
