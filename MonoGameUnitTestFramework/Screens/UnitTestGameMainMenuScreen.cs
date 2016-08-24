@@ -1,5 +1,5 @@
-﻿using _2DEngine;
-using _2DEngineData;
+﻿using CelesteEngine;
+using CelesteEngineData;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -88,7 +88,7 @@ namespace MonoGameUnitTestFramework
         {
             base.HandleInput(elapsedGameTime, mousePosition);
 
-            if (GameKeyboard.IsKeyPressed(Keys.Escape))
+            if (GameKeyboard.Instance.IsKeyPressed(Keys.Escape))
             {
                 Die();
             }

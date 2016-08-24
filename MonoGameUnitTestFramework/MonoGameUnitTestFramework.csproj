@@ -63,13 +63,13 @@
     <Compile Include="Utils\ExtensionFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\2DEngine\2DEngineData\2DEngineData.csproj">
-      <Project>{ed8a2787-963c-45ce-9405-d4a031b3a977}</Project>
-      <Name>2DEngineData</Name>
+    <ProjectReference Include="..\..\CelesteEngine\CelesteEngineData\CelesteEngineData.csproj">
+      <Project>{7516016D-EF87-429A-ADAD-5C2061ED668B}</Project>
+      <Name>CelesteEngineData</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\2DEngine\2DEngine\2DEngine.csproj">
-      <Project>{b56f5aa9-69a8-454a-9ee5-a815735804b7}</Project>
-      <Name>2DEngine</Name>
+    <ProjectReference Include="..\..\CelesteEngine\CelesteEngine\CelesteEngine.csproj">
+      <Project>{B4C3C278-BC1C-49CD-82BF-76B93EF7F59D}</Project>
+      <Name>CelesteEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
