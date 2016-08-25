@@ -43,24 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\FunctionNameAttribute.cs" />
-    <Compile Include="Attributes\Parameters\TemplateParametersAttribute.cs" />
-    <Compile Include="Attributes\Parameters\FunctionParametersAttribute.cs" />
-    <Compile Include="Attributes\Test Function Attributes\TestPassesIfFunctionCallSuccessAttribute.cs" />
-    <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsValueAttribute.cs" />
-    <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsNullAttribute .cs" />
-    <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsTypeAttribute.cs" />
-    <Compile Include="Attributes\Test Outcome\ShouldFailAttribute.cs" />
-    <Compile Include="Attributes\Test Outcome\ShouldPassAttribute.cs" />
-    <Compile Include="Attributes\TestTypeAttribute.cs" />
-    <Compile Include="Attributes\Test Function Attributes\TestPassesIfReturnsNotNullAttribute.cs" />
     <Compile Include="Screens\UnitTestGameMainMenuScreen.cs" />
     <Compile Include="Utils\DebugUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Attributes\Test Function Attributes\TestPassIfAttribute.cs" />
-    <Compile Include="Unit Tests\AutogenUnitTest.cs" />
     <Compile Include="Unit Tests\UnitTest.cs" />
-    <Compile Include="Utils\ExtensionFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CelesteEngine\CelesteEngineData\CelesteEngineData.csproj">
@@ -68,7 +54,7 @@
       <Name>CelesteEngineData</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\CelesteEngine\CelesteEngine\CelesteEngine.csproj">
-      <Project>{B4C3C278-BC1C-49CD-82BF-76B93EF7F59D}</Project>
+      <Project>{b4c3c278-bc1c-49cd-82bf-76b93ef7f59d}</Project>
       <Name>CelesteEngine</Name>
     </ProjectReference>
   </ItemGroup>
